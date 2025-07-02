@@ -1,0 +1,93 @@
+***//Player Base Movement
+
+using UnityEngine;
+public class CharacterMovement : MonoBehaviour {
+public float speed = 5;
+// Use this for initialization void Start()
+{
+Cursor.lockState = CursorLockMode. Locked;
+}
+// Update is called once per frame void Update()
+{
+    float Horizontal = Input.GetAxis("Horizontal") * speed;
+    float Vertical = Input.GetAxis("Vertical") * speed;
+    Horizontal *= Time.deltaTime; Vertical *= Time.deltaTime; transform.Translate(Horizontal, 0,
+    Vertical);
+    if (Input.GetKeyDown("escape")) Cursor.lockState = CursorLockMode.
+    None; }
+}
+
+
+
+***//Jump and Gravity, Replace Code in CharacterMovement.cs
+using UnityEngine;
+public class CharacterMovement : MonoBehaviour {
+public float speed = 5; public float jumpPower = 4;Rigidbody rb; CapsuleCollider col;
+// Use this for initialization void Start()
+{
+Cursor.lockState = CursorLockMode. Locked;
+rb = GetComponent<Rigidbody>();
+col = GetComponent<CapsuleCollider>(); }
+// Update is called once per frame void Update()
+{
+//Get the input value from the controllers
+float Horizontal = Input. GetAxis("Horizontal") * speed;
+float Vertical = Input. GetAxis("Vertical") * speed;
+Horizontal *= Time.deltaTime; Vertical *= Time.deltaTime; //Translate our character via our
+inputs.
+transform.Translate(Horizontal, 0,
+Vertical);
+if (isGrounded() && Input. GetButtonDown("Jump"))
+{
+//Add upward force to the rigid
+body when we press jump. rb.AddForce(Vector3.up *
+jumpPower, ForceMode.Impulse); }
+if (Input.GetKeyDown("escape")) Cursor.lockState = CursorLockMode.
+None; }
+private bool isGrounded() {
+    //Test that we are grounded by drawing an invisible line (raycast)
+    //If this hits a solid object e.g.
+    floor then we are grounded.
+return Physics.Raycast(transform.
+position, Vector3.down, col.bounds.extents.y + 0.1f);
+} }
+
+
+
+
+*** //Implementing ability to look around
+using UnityEngine;
+public class MouseLook : MonoBehaviour {
+private GameObject player; private float minClamp = -45; private float maxClamp = 45; [HideInInspector]
+public Vector2 rotation;
+private Vector2 currentLookRot;
+private Vector2 rotationV = new Vector2(0,
+0);
+public float lookSensitivity = 2; public float lookSmoothDamp = 0.1f;
+void Start() {
+//Access the player GameObject.
+player = transform.parent.gameObject; }
+// Update is called once per frame void Update()
+{
+//Player input from the mouse
+rotation.y += Input.GetAxis("Mouse Y") * lookSensitivity;
+//Limit ability look up and down.
+rotation.y = Mathf.Clamp(rotation.y, minClamp, maxClamp);
+//Rotate the character around based on the mouse X position.
+player.transform. RotateAround(transform.position, Vector3.up, Input.GetAxis("Mouse X") * lookSensitivity);
+//Smooth the current Y rotation for looking up and down.
+currentLookRot.y = Mathf. SmoothDamp(currentLookRot.y, rotation.y, ref rotationV.y, lookSmoothDamp);
+//Update the camera X rotation based on the values generated.
+transform.localEulerAngles = new Vector3(-currentLookRot.y, 0, 0);
+} }
+
+
+
+*** Projectile Movement 
+using UnityEngine;
+public class ProjectileMovement : MonoBehaviour {
+    public float speed = 10f;
+    // Update is called once per frame
+    void Update() {
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+    } }
