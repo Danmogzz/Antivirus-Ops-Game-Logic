@@ -1,0 +1,43 @@
+// Bullet Hit 
+using UnityEngine;
+public class BulletHit : MonoBehaviour
+{
+    //When we touch the collider we disable this object.
+    void OnCollisionEnter()
+    {
+        gameObject.SetActive(false);
+    }
+}
+
+
+***// Enemy Damage
+using UnityEngine;
+public class EnemyDamage : MonoBehaviour {
+    //Private means only this script can access the variable.
+    private int hitNumber;
+    //Unity stores the collider it hits and we can access it via the name other.
+    void OnCollisionEnter(Collision other) {
+        //We compare the tag in the other object to the tag name we set earlier.
+        if (other.transform.CompareTag("bullet"))
+        {
+            //If the comparison is true, we
+            increase the hit number. hitNumber++;
+        }
+        //if the hit number is equal to 3 we destroy this object.
+        if (hitNumber == 3) {
+            Destroy(gameObject); }
+    } }
+
+
+using UnityEngine;
+public class SendDamage : MonoBehaviour {
+void OnCollisionStay(Collision other) {
+//We compare the tag in the other object to the tag name we set earlier.
+if (other.transform. CompareTag("Player"))
+{
+//If the above matches, then send
+a message to the other object.
+//This will also pass a value of 1
+for our damage. other.transform.
+SendMessage("ApplyDamage", 1); }
+} }
