@@ -1,0 +1,166 @@
+using System.Collections;
+using System.Collections.Generic; using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+public class Spawners {
+public GameObject go;
+public bool active;
+public Spawners(GameObject newGo,
+bool newBool) {
+go = newGo;
+active = newBool; }
+}
+public class GameManager : MonoBehaviour {
+    public GameObject panel;
+    public delegate void RestartRounds(); public static event RestartRounds
+    RoundComplete;
+    private int health;
+    private int roundsSurived;
+    private int currentRound;
+    private PlayerDamage playerDamage; private Text panelText;
+    public List<Spawners> spawner = new List<Spawners>();
+    void Start() {
+        Time.timeScale = 1; panel.SetActive(false); playerDamage = GameObject.
+        FindGameObjectWithTag("Player").GetComponent<PlayerDamage>();
+        panelText = panel.GetComponentInChildren<Text>();
+        foreach (GameObject go in GameObject.FindObjectsOfType(typeof(Game Object)))
+{
+            if (go.name.
+            Contains("Spawner")) {
+                spawner.Add(new Spawners(go, true));
+            } }
+    }
+    void Update() { int total = 0;
+        health = playerDamage.health; if (health > 0)
+        {
+            for (int i = spawner.Count - 1; i >= 0; i--)
+            {
+                if (spawner[i].
+                go.GetComponent<Spawner>().spawnsDead) {
+                    total++; }
+            }
+            if (total == spawner.Count && roundsSurived == currentRound)
+            {
+                roundsSurived++;
+                panelText.text = string.Format("Round {0} Completed!",
+                roundsSurived); }
+            panel.SetActive(true);
+            if (roundsSurived != currentRound && Input.GetButton("Fire2"))
+            {
+                currentRound =
+                roundsSurived;
+                RoundComplete();
+                panel.SetActive(false); }
+        } else {
+            if (Input.GetButton("Fire2")) {
+                Scene current = SceneManager.GetActiveScene();
+                SceneManager.LoadScene(current.name);
+            } else {
+                panel.SetActive(true);
+                panelText.text = string.Format("Survived {0} Rounds",
+                roundsSurived); Time.timeScale = 0;
+            } } } }
+//              *** Updates to Spawner script 
+
+using System;
+using System.Collections;
+using System.Collections.Generic; using UnityEngine;
+public class Enemy {
+public GameObject go;
+public bool active;
+public Enemy (GameObject newGo, bool
+newBool) {
+go = newGo;
+active = newBool; }
+}
+public class Spawner : MonoBehaviour {
+    public GameObject spawn; public int amount = 1; public float delaySpawn = 1; public bool spawnsDead;
+    private int getAmount; private float timer; private int spawned; private int enemyDead;
+    public List<Enemy> enemies = new List<Enemy>();
+    public void Start() {
+        GameManager.RoundComplete += ResetRound;
+        ResetRound();
+        while (spawned < getAmount) {
+            //Increment the amount spawned count.
+            spawned++;
+            //Create the prefab as an instance.
+            GameObject instance = Instantiate(spawn, transform);
+            enemies.Add(new Enemy(instance, false));
+            //Removes the spawned object from the spawner object.
+            instance.transform.parent =
+            null;
+            instance.SetActive(false);
+        }
+        ResetRound(); }
+    public void ResetRound() {
+        spawnsDead = false; getAmount = amount; spawned = 0;
+        timer = 0; enemyDead = 0;
+    }
+    void Update() {
+        //Increase timer per frame. timer += Time.deltaTime;
+        //Do the spawn if our timer is
+        larger than the delay spawn we set. if (delaySpawn < timer)
+        {
+            //And we haven't reached the
+            spawn amount.
+if (spawned < getAmount)
+            {
+                //Reset our timer. timer = 0;
+                //Set our bool to track
+                the state of the enemy.enemies[spawned].active
+isKinematic.ic(spawned)); spawned count.
+}
+            for (int i = enemies.Count - 1; i >= 0; i--)
+            {
+                //If another script
+                disabled the object but we set them active above.
+                = true;
+                active.go.SetActive(true);
+                //Set the enemy to be enemies[spawned].
+                //Get ready to set StartCoroutine(SetKinemat //Increment the amount spawned++;
+                if (enemies[i].go.activeSelf == false && enemies[i].
+                active == true)
+                {
+                    //Reset the spawn position and set our tracking bool that
+                    they are not active. enemies[i].
+                    go.transform.position = transform.position;
+                    false;
+                    enemies[i].active =
+                    enemyDead++; }
+            }
+            if (enemyDead == enemies.
+            {
+                spawnsDead = true;
+                Count)
+} }
+    }
+    IEnumerator SetKinematic(int id) {
+        //We set isKinematic at the start of the next frame to avoid confusion with other commands.
+        yield return null;
+        enemies[id].go.GetComponent<Rigidbody>().isKinematic = true;
+    }
+    private void OnDrawGizmos() {
+        //Draw the wireframe mesh of what we intend to spawn in our editor.
+        Gizmos.color = Color.red; if (spawn != null)
+        {
+            Gizmos.DrawWireMesh(spawn.GetComponent<MeshFilter>().sharedMesh,
+            transform.position, spawn.transform.rotation, Vector3.one);
+        } }
+}
+
+//                                  *** Updates to EnemyDamage script 
+
+using UnityEngine;
+public class EnemyDamage : MonoBehaviour {
+private int hitNumber;
+private void OnEnable() {
+hitNumber = 0; }
+void OnCollisionEnter(Collision other)
+{
+if (other.transform.
+CompareTag("bullet")) {
+//If the comparison is true, we increase the hit number.
+hitNumber++; }
+if (hitNumber == 3) {
+gameObject.SetActive(false); }
+} }
